@@ -38,7 +38,7 @@ enum Kind {
         content_length: Option<u64>,
         recv: h2::RecvStream,
     },
-    Wrapped(Box<Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send>),
+    Wrapped(Box<Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send + Sync>),
 }
 
 struct Extra {
@@ -139,7 +139,7 @@ impl Body {
     /// ```
     pub fn wrap_stream<S>(stream: S) -> Body
     where
-        S: Stream + Send + 'static,
+        S: Stream + Sync + Send + 'static,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
         Chunk: From<S::Item>,
     {
@@ -393,13 +393,13 @@ impl From<Chunk> for Body {
 }
 
 impl
-    From<Box<Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send + 'static>>
+    From<Box<Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send + Sync + 'static>>
     for Body
 {
     #[inline]
     fn from(
         stream: Box<
-            Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send + 'static,
+            Stream<Item = Chunk, Error = Box<::std::error::Error + Send + Sync>> + Send + Sync + 'static,
         >,
     ) -> Body {
         Body::new(Kind::Wrapped(stream))
