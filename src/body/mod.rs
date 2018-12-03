@@ -44,6 +44,7 @@ fn _assert_send_sync() {
 
     _assert_send::<Body>();
     _assert_send::<Chunk>();
+    _assert_sync::<Body>();
     _assert_sync::<Chunk>();
 }
 
